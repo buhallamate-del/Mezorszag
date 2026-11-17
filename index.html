@@ -1,0 +1,589 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Mézország</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Manrope:wght@400;600;700;800&display=swap">
+<style>
+/* Layout: egyoszlopos telefonos méhes – ragadós mézmérleg fent, koppintható lép középen, bolt alatta fülekkel */
+:root{
+  --bg:#eef1e4; --surface:#f8faf1; --ink:#1d2a1f; --muted:#5b6956; --line:#cfd7bf;
+  --honey:#d48600; --honey-soft:#f3c04a; --honey-ink:#7a4700; --on-honey:#2a1700;
+  --cell:#e1e7d1; --leaf:#3f6e2c;
+  --f-display:"DM Serif Display", Georgia, "Times New Roman", serif;
+  --f-body:"Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#132019; --surface:#1a2a21; --ink:#eef0dc; --muted:#9aa892; --line:#2d3f32;
+  --honey:#f2a516; --honey-soft:#f6c75a; --honey-ink:#ffd27a; --on-honey:#2a1700;
+  --cell:#22362a; --leaf:#8fc06f; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#132019; --surface:#1a2a21; --ink:#eef0dc; --muted:#9aa892; --line:#2d3f32;
+  --honey:#f2a516; --honey-soft:#f6c75a; --honey-ink:#ffd27a; --on-honey:#2a1700;
+  --cell:#22362a; --leaf:#8fc06f; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.45;-webkit-tap-highlight-color:transparent}
+.wrap{max-width:560px;margin:0 auto;padding-inline:16px;padding-block:0 56px}
+.num{font-variant-numeric:tabular-nums}
+
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:14px 10px;border-bottom:1px solid var(--line);display:grid;gap:10px}
+.brand{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.brand h1{font-family:var(--f-display);font-weight:400;font-size:26px;margin:0;letter-spacing:.2px}
+.brand .tag{font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:700;text-align:right}
+.scale{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.honey{font-size:34px;font-weight:800;line-height:1;color:var(--honey-ink)}
+.rates{text-align:right;font-size:13px;color:var(--muted);display:grid;gap:2px}
+.rates b{color:var(--ink);font-weight:700}
+.frenzy-tag{color:var(--on-honey);background:var(--honey-soft);border-radius:999px;padding:1px 8px;font-weight:800;justify-self:end}
+
+.season{display:grid;gap:6px}
+.season-head{display:flex;justify-content:space-between;font-size:13px;gap:8px}
+.season-head strong{font-weight:800}
+.season-head .mult{font-weight:800;color:var(--honey-ink)}
+.track{display:grid;grid-template-columns:repeat(5,1fr);gap:3px}
+.seg{position:relative;height:22px;border-radius:4px;background:var(--cell);overflow:hidden;font-size:10.5px;font-weight:700;color:var(--muted);display:flex;align-items:center;justify-content:center;letter-spacing:.02em}
+.seg .fill{position:absolute;inset:0 auto 0 0;background:var(--honey-soft);opacity:.55;width:0}
+.seg span{position:relative}
+.seg.now{color:var(--on-honey)}
+.seg.now .fill{opacity:1}
+.seg.past .fill{width:100%;opacity:.18}
+
+.comb-wrap{position:relative;display:grid;place-items:center;padding-block:18px 6px}
+.comb{appearance:none;border:0;background:none;padding:0;cursor:pointer;width:min(290px,78vw);touch-action:manipulation;border-radius:50%}
+.comb:focus-visible{outline:3px solid var(--honey);outline-offset:6px}
+.comb svg{display:block;width:100%;height:auto;overflow:visible;transition:transform .08s}
+.comb .c-empty{fill:var(--cell);stroke:var(--line);stroke-width:2}
+.comb .c-honey{fill:var(--honey)}
+.comb:active svg{transform:scale(.97)}
+.comb.sealed .c-honey{fill:var(--honey-soft)}
+.comb.sealed svg{animation:seal .7s ease-out}
+.comb.frenzy svg{filter:drop-shadow(0 0 14px var(--honey-soft))}
+@keyframes seal{0%{transform:scale(1)}30%{transform:scale(1.06)}100%{transform:scale(1)}}
+.comb-cap{font-size:12.5px;color:var(--muted);text-align:center;margin:8px 0 0}
+.float{position:absolute;pointer-events:none;font-weight:800;font-size:15px;color:var(--honey-ink);animation:up .9s ease-out forwards;white-space:nowrap;transform:translate(-50%,-50%);z-index:2}
+@keyframes up{to{transform:translate(-50%,-180%);opacity:0}}
+.swarm{position:absolute;z-index:3;appearance:none;border:2px solid var(--honey-ink);background:var(--honey-soft);color:var(--on-honey);font:800 13px var(--f-body);padding:8px 14px;border-radius:999px;cursor:pointer;transform:translate(-50%,-50%);animation:buzz .9s ease-in-out infinite alternate;box-shadow:0 4px 14px rgba(0,0,0,.18)}
+.swarm:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+@keyframes buzz{from{transform:translate(-50%,-50%) rotate(-4deg)}to{transform:translate(-54%,-60%) rotate(4deg)}}
+
+.tabs{display:flex;gap:4px;margin-block:18px 12px;border-bottom:1px solid var(--line)}
+.tab{appearance:none;background:none;border:0;border-bottom:3px solid transparent;color:var(--muted);font:700 14px var(--f-body);padding:10px 6px;margin-bottom:-1px;cursor:pointer;flex:1}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--honey)}
+.tab:focus-visible{outline:2px solid var(--honey);outline-offset:-2px}
+.tab .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--honey);margin-left:6px;vertical-align:middle}
+
+.modes{display:flex;justify-content:flex-end;gap:4px;margin-bottom:8px}
+.mode{appearance:none;border:1px solid var(--line);background:var(--surface);color:var(--muted);font:700 12.5px var(--f-body);padding:5px 12px;border-radius:999px;cursor:pointer}
+.mode[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+
+.list{display:grid;gap:8px}
+.row{display:flex;gap:12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px}
+.row-main{flex:1;min-width:0}
+.row-title{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.row-title .name{font-weight:800;font-size:15.5px}
+.row-title .count{font-weight:800;color:var(--honey-ink);font-size:14px}
+.row-title .lvl{font-size:12px;font-weight:700;color:var(--muted)}
+.desc{margin:3px 0 0;color:var(--muted);font-size:13px}
+.meta{margin:4px 0 0;font-size:12.5px;font-weight:600}
+.next-up{margin:3px 0 0;font-size:12px;color:var(--leaf);font-weight:700}
+.row.locked{opacity:.6;border-style:dashed}
+.buy{appearance:none;border:0;border-radius:8px;min-width:96px;padding:10px;font:800 13.5px var(--f-body);background:var(--honey);color:var(--on-honey);cursor:pointer;text-align:center;line-height:1.2}
+.buy small{display:block;font-weight:700;font-size:11px;opacity:.75}
+.buy:disabled{background:var(--cell);color:var(--muted);cursor:default}
+.buy:focus-visible,.mode:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.empty{color:var(--muted);font-size:13.5px;padding:8px 2px}
+.owned-head{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700;margin:18px 0 6px}
+.owned-ups{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px;background:var(--cell);color:var(--muted)}
+
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;display:grid;gap:12px}
+.panel + .panel,.panel + h3,.list + h3{margin-top:14px}
+.panel h2{font-family:var(--f-display);font-weight:400;font-size:22px;margin:0}
+.panel p{margin:0;color:var(--muted);font-size:13.5px;max-width:62ch}
+.sec-title{font-family:var(--f-display);font-weight:400;font-size:20px;margin:22px 0 4px}
+.sec-note{margin:0 0 10px;color:var(--muted);font-size:13px}
+.qstats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.qstat{display:grid;gap:2px}
+.qstat .k{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700}
+.qstat .v{font-size:19px;font-weight:800}
+.qbtn{justify-self:start;min-width:200px;padding:12px 16px}
+.bar{height:8px;border-radius:999px;background:var(--cell);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--leaf);width:0}
+.region-map{display:flex;flex-wrap:wrap;gap:6px}
+.region-map span{font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px;background:var(--cell);color:var(--muted)}
+.region-map span.done{background:var(--leaf);color:var(--bg)}
+.region-map span.here{background:var(--honey);color:var(--on-honey)}
+.stats{margin-top:18px;display:grid;gap:6px;font-size:13px;color:var(--muted)}
+.stats div{display:flex;justify-content:space-between;gap:10px;border-bottom:1px dashed var(--line);padding-bottom:5px}
+.stats b{color:var(--ink)}
+.reset{appearance:none;background:none;border:0;color:var(--muted);text-decoration:underline;font:600 12.5px var(--f-body);cursor:pointer;padding:8px 0;margin-top:6px}
+
+.toasts{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);display:grid;gap:6px;z-index:10;width:min(92vw,420px);pointer-events:none}
+.toast{background:var(--ink);color:var(--bg);padding:10px 14px;border-radius:10px;font-size:13.5px;font-weight:600;animation:tin .25s ease-out}
+@keyframes tin{from{transform:translateY(8px);opacity:0}}
+@media (prefers-reduced-motion: reduce){
+  .float{animation-duration:.4s}.comb.sealed svg,.toast,.swarm{animation:none}.comb svg{transition:none}
+}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand"><h1>Mézország</h1><span class="tag num" id="tag"></span></div>
+    <div class="scale">
+      <div class="honey num" id="honey">0 g</div>
+      <div class="rates num"><span><b id="gps">0 g</b> / mp</span><span>koppintás: <b id="tapv">1 g</b></span><span class="frenzy-tag" id="frenzyTag" hidden></span></div>
+    </div>
+    <div class="season">
+      <div class="season-head"><span><strong id="sName">Repce</strong> · <span id="sMonth">április</span></span><span>virágzás <span class="mult num" id="sMult">×1,5</span></span></div>
+      <div class="track" id="track"></div>
+    </div>
+  </header>
+
+  <div class="comb-wrap" id="combWrap">
+    <button class="comb" id="comb" aria-label="Koppints a lépre: mézet gyűjtesz"></button>
+    <p class="comb-cap num" id="combCap">Töltsd meg a lépet: a lezárt lép jutalmat ad.</p>
+  </div>
+
+  <nav class="tabs" role="tablist">
+    <button class="tab" role="tab" id="t-b" aria-selected="true" aria-controls="p-b">Méhészet</button>
+    <button class="tab" role="tab" id="t-u" aria-selected="false" aria-controls="p-u">Fejlesztések<span class="dot" id="upDot" hidden></span></button>
+    <button class="tab" role="tab" id="t-q" aria-selected="false" aria-controls="p-q">Anyaméh<span class="dot" id="qDot" hidden></span></button>
+  </nav>
+
+  <section id="p-b" role="tabpanel">
+    <div class="modes" role="group" aria-label="Vásárlási mennyiség">
+      <button class="mode" data-m="1" aria-pressed="true">×1</button>
+      <button class="mode" data-m="10" aria-pressed="false">×10</button>
+      <button class="mode" data-m="max" aria-pressed="false">Max</button>
+    </div>
+    <div class="list" id="bList"></div>
+  </section>
+
+  <section id="p-u" role="tabpanel" hidden>
+    <div class="list" id="uList"></div>
+    <p class="owned-head" id="uOwnedHead" hidden>Megvett fejlesztések</p>
+    <div class="owned-ups" id="uOwned"></div>
+  </section>
+
+  <section id="p-q" role="tabpanel" hidden>
+    <div class="panel">
+      <h2>Új anyaméh nevelése</h2>
+      <p>A méhészet újraindul, de a méhpempő megmarad. Minden adag növeli az összes termelést (Alföldön 5%-kal, minden új vidéken 1 százalékponttal többel). Az első adaghoz 1 tonna méz kell egy körön belül.</p>
+      <div class="qstats">
+        <div class="qstat"><span class="k">Méhpempő</span><span class="v num" id="qHave">0</span></div>
+        <div class="qstat"><span class="k">Bónusz most</span><span class="v num" id="qBonus">+0%</span></div>
+        <div class="qstat"><span class="k">Most kapnál</span><span class="v num" id="qGain">0</span></div>
+        <div class="qstat"><span class="k">Következő adag</span><span class="v num" id="qNext">–</span></div>
+      </div>
+      <button class="buy qbtn" id="qBtn" disabled>Anyaméh nevelése</button>
+    </div>
+
+    <h3 class="sec-title">Anyai tulajdonságok</h3>
+    <p class="sec-note">Méhpempőért veszed, és örökre megmaradnak, költözés után is. Az elköltött pempő viszont már nem ad bónuszt.</p>
+    <div class="list" id="pList"></div>
+
+    <h3 class="sec-title">Új vidék</h3>
+    <div class="panel">
+      <div class="region-map" id="rMap"></div>
+      <p id="rNext"></p>
+      <div class="bar" aria-hidden="true"><i id="rBar"></i></div>
+      <p class="num" id="rProg"></p>
+      <button class="buy qbtn" id="rBtn" disabled>Költözés</button>
+    </div>
+
+    <div class="stats num">
+      <div><span>Összes gyűjtött méz</span><b id="stEver">0 g</b></div>
+      <div><span>Ebben a körben</span><b id="stRun">0 g</b></div>
+      <div><span>Koppintások</span><b id="stTaps">0</b></div>
+      <div><span>Lezárt lépek</span><b id="stSealed">0</b></div>
+      <div><span>Elkapott rajok</span><b id="stSwarms">0</b></div>
+      <div><span>Nevelt anyák</span><b id="stResets">0</b></div>
+    </div>
+    <button class="reset" id="hardReset">Teljes újrakezdés</button>
+  </section>
+</div>
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<script>
+(function(){
+const SEASON_LEN = 40;
+const SEASONS = [
+  {id:'repce', name:'Repce', short:'Repce', month:'április', mult:1.5},
+  {id:'akac', name:'Akác', short:'Akác', month:'május', mult:3},
+  {id:'hars', name:'Hárs', short:'Hárs', month:'június', mult:2},
+  {id:'napraf', name:'Napraforgó', short:'Napraf.', month:'július', mult:1.5},
+  {id:'tel', name:'Áttelelés', short:'Tél', month:'november–február', mult:0.3}
+];
+const REGIONS = [
+  {name:'Alföld', desc:'Akácosok és napraforgótáblák a síkságon.'},
+  {name:'Tokaj-hegyalja', desc:'A hárs itt erősebb: hársvirágzás alap ×3,5.', tw:{hars:3.5}},
+  {name:'Balaton-felvidék', desc:'Napraforgó helyett levendula, alap ×3.', tw:{napraf:3}, rn:{napraf:['Levendula','Levend.','június–július']}},
+  {name:'Bükk', desc:'Repce helyett erdei vadvirág, alap ×2,5.', tw:{repce:2.5}, rn:{repce:['Vadvirág','Vadvir.','április–május']}},
+  {name:'Őrség', desc:'Enyhe tél: áttelelés alatt az alap ×0,6.', tw:{tel:0.6}},
+  {name:'Hargita', desc:'Akác alap ×4, de kemény a tél: ×0,1.', tw:{akac:4,tel:0.1}},
+  {name:'Kárpátok', desc:'Minden virágzás +1 szorzót kap.', plus:1}
+];
+function roman(n){const m=[[10,'X'],[9,'IX'],[5,'V'],[4,'IV'],[1,'I']];let s='';for(const [v,r] of m)while(n>=v){s+=r;n-=v}return s}
+function region(i){if(i<REGIONS.length)return REGIONS[i];const k=i-REGIONS.length+2;return {name:'Kárpátok '+roman(k),desc:'Minden virágzás +'+k+' szorzót kap.',plus:k}}
+
+const TIERS=[10,25,50,100,150,200,300];
+const B = [
+  {id:'meh', name:'Gyűjtőméh', base:15, rate:0.2, desc:'Egy méh egész életében alig fél gramm mézet gyűjt. Sokan kellenek.', ups:['Táncnyelv','Krajnai méh','Nektárgyomor','Virághűség','Feromonjelzés','Hosszabb nyár','Sokszemű raj']},
+  {id:'keret', name:'Lépkeret', base:120, rate:1.6, desc:'Kész keret: nem kell a nulláról építeni a lépet.', ups:['Műlép','Drótozott keret','Fiókkeret','Anyarács','Mézkamra-keret','Viaszolvasztó','Lépépítő család']},
+  {id:'kaptar', name:'Kaptár', base:1300, rate:11, desc:'Egy erős család nyáron 40–60 ezer méhből áll.', ups:['Hunor kaptár','Nagy Boconádi kaptár','Rakodó kaptár','Hálós aljdeszka','Szigetelt fedél','Kaptármérleg','Atkakezelés']},
+  {id:'mehes', name:'Méhes', base:14000, rate:65, desc:'Kaptársor a kert végében, itatóval.', ups:['Itatóvályú','Szélfogó sövény','Méhlegelő','Pergetőkamra','Napelemes pergető','Mézharmat-figyelés','Bemutatóméhes']},
+  {id:'vandor', name:'Vándorkocsi', base:160000, rate:400, desc:'Éjjel költözik a virágzás után, hajnalban már gyűjtenek.', ups:['Éjszakai költözés','Rakodódaru','Pótkocsi','Virágtérkép','Hűtött raktér','Második kocsi','Vándorkaraván']},
+  {id:'dulo', name:'Akácos dűlő', base:2e6, rate:2800, desc:'Saját akácerdő. Májusban fehér az egész domboldal.', ups:['Fiatal akácos','Erdészeti szerződés','Facsemete-program','Hársas szegély','Facéliavetés','Erdei tisztás','Öreg erdő']},
+  {id:'szov', name:'Szövetkezet', base:3e7, rate:20000, desc:'Közös pergetés, közös palackozás, közös gond.', ups:['Közös pergetőüzem','Eredetvédelem','Mézlabor','Saját címke','Exportpult','Mézverseny','Mézborpince']},
+  {id:'orszag', name:'Mézország', base:5e8, rate:150000, desc:'A Kárpát-medence minden virága a tiéd.', ups:['Mézút','Hungarikum-pecsét','Mézvasút','Nemzeti méhlegelő','Méhtörzskönyv','Mézparlament','Aranylép']},
+  {id:'akad', name:'Méhészakadémia', base:8e9, rate:1.1e6, desc:'Itt tanítják a táncnyelvet. Vizsga van, puska nincs.', ups:['Tankaptár','Méhészkönyvtár','Ösztöndíj','Konferencia','Doktori iskola','Kutatóállomás','Méhészeti díj']},
+  {id:'egi', name:'Csillagméhes', base:1.4e11, rate:8e6, desc:'A Tejút is csak egy hosszú, virágos rét.', ups:['Holdkaptár','Napvitorlás raj','Csillagvirág','Üstökösnektár','Gravitációs pergető','Tejút-dűlő','Galaktikus lép']}
+];
+const U = [
+  {id:'fust', name:'Füstölő', cost:60, need:s=>s.run>=20, desc:'Nyugodtabb méhek: a koppintás ×2.'},
+  {id:'kanal', name:'Mézeskanál', cost:3000, need:s=>s.run>=1000, desc:'A koppintás ×3.'},
+  {id:'kesztyu', name:'Méhészkesztyű', cost:4000, need:s=>s.run>=1500, desc:'A koppintás a termelés 2%-át is hozza.'},
+  {id:'teli', name:'Téli takarás', cost:2e4, need:s=>s.run>=5000, desc:'Áttelelés alatt +0,5 szorzó.'},
+  {id:'repce', name:'Repcetábla', cost:5e4, need:s=>s.run>=2e4, desc:'Az első virágzás +1 szorzót kap.'},
+  {id:'fedel', name:'Fedelezés', cost:9e4, need:s=>s.sealed>=3, desc:'A lezárt lép jutalma 25% helyett 60%.'},
+  {id:'rajlada', name:'Rajfogó láda', cost:2e5, need:s=>s.swarms>=1, desc:'Kétszer olyan gyakran jönnek a rajok.'},
+  {id:'akac', name:'Virágzásfigyelő', cost:3e5, need:s=>s.run>=8e4, desc:'Az akácvirágzás szorzója ×1,5.'},
+  {id:'kalap', name:'Méhészkalap', cost:4e5, need:s=>s.run>=1e5, desc:'A koppintás további 4%-ot hoz a termelésből.'},
+  {id:'napraf', name:'Napraforgóföld', cost:2e6, need:s=>s.run>=5e5, desc:'A negyedik virágzás +1 szorzót kap.'},
+  {id:'hars', name:'Hársfasor', cost:4e6, need:s=>s.run>=1e6, desc:'A hársvirágzás szorzója ×1,5.'},
+  {id:'beporzas', name:'Beporzás', cost:1e7, need:s=>(s.owned.meh||0)>=50, desc:'Minden 50 gyűjtőméh +10% az összes termelésre.'},
+  {id:'rajmez', name:'Rajméz', cost:5e7, need:s=>s.swarms>=5, desc:'A raj jutalma ×2, a virágzási láz ×7 lesz ×5 helyett.'},
+  {id:'naptar', name:'Virágzási naptár', cost:6e7, need:s=>s.run>=1.5e7, desc:'Minden virágzás +0,5 szorzót kap.'},
+  {id:'pergeto', name:'Kézi pergető', cost:2e8, need:s=>s.run>=5e7, desc:'A koppintás további 8%-ot hoz a termelésből.'},
+  {id:'nagylep', name:'Nagy lép', cost:5e8, need:s=>s.up.fedel&&s.sealed>=40, desc:'A lezárt lép jutalma 150%.'},
+  {id:'propolisz', name:'Propolisz', cost:3e9, need:s=>s.run>=1e9, desc:'Minden termelés ×1,5.'},
+  {id:'mezbor', name:'Mézbor', cost:5e10, need:s=>s.run>=1e10, desc:'Minden termelés ×1,5.'},
+  {id:'viasz', name:'Viaszgyertya-üzem', cost:2e12, need:s=>s.run>=5e11, desc:'Minden termelés ×2.'},
+  {id:'virpor', name:'Virágpor-gyűjtés', cost:1e14, need:s=>s.run>=3e13, desc:'Minden termelés ×2.'},
+  {id:'harmat', name:'Mézharmat', cost:1e16, need:s=>s.run>=3e15, desc:'Minden termelés ×2.'},
+  {id:'kirlep', name:'Királyi lép', cost:1e18, need:s=>s.run>=3e17, desc:'Minden termelés ×3.'},
+  {id:'egbolt', name:'Mézes égbolt', cost:1e21, need:s=>s.run>=3e20, desc:'Minden termelés ×3.'}
+];
+B.forEach(b=>TIERS.forEach((t,k)=>{
+  U.push({id:'b_'+b.id+'_'+(k+1), name:b.ups[k], bcost:b.base*Math.pow(1.15,t)*4, need:s=>(s.owned[b.id]||0)>=t, desc:b.name+': termelés ×2.', b:b.id, tier:t});
+}));
+const P = [
+  {id:'szelid', name:'Szelíd természet', max:1, cost:l=>3, desc:'Minden új kör a Füstölővel és a Méhészkesztyűvel indul.'},
+  {id:'kezdes', name:'Erős kezdés', max:10, cost:l=>4*Math.pow(2,l), desc:'Szintenként +10 gyűjtőméh és +5 lépkeret induláskor.'},
+  {id:'kiraly', name:'Királyi vér', max:Infinity, cost:l=>Math.ceil(10*Math.pow(1.7,l)), desc:'Szintenként ×1,1 minden termelés.'},
+  {id:'rajcsal', name:'Rajcsalogató', max:5, cost:l=>6*Math.pow(2,l), desc:'Szintenként 20%-kal gyakoribb raj.'},
+  {id:'hideg', name:'Hidegtűrés', max:3, cost:l=>5*Math.pow(3,l), desc:'Szintenként +0,3 szorzó áttelelés alatt.'},
+  {id:'gyorslep', name:'Gyors lép', max:5, cost:l=>5*Math.pow(2,l), desc:'Szintenként 15%-kal hamarabb telik meg a lép.'},
+  {id:'tudas', name:'Örökölt tudás', max:1, cost:l=>30, desc:'Az épületfejlesztések fele annyiba kerülnek.'}
+];
+
+const KEY='mezorszag:v1';
+function fresh(){return {honey:0,run:0,ever:0,taps:0,sealed:0,sealedEver:0,owned:{},up:{},pempo:0,pempoRegion:0,season:0,comb:0,last:Date.now(),resets:0,region:0,perks:{},swarms:0}}
+let S = fresh();
+let buyMode='1', frenzy=0, frenzyMult=1, swarmIn=rnd(60,120), swarmEl=null, swarmLife=0;
+
+function rnd(a,b){return a+Math.random()*(b-a)}
+function lv(id){return S.perks[id]||0}
+
+// formázás
+function num(v){const d=v<10?2:v<100?1:0;return v.toLocaleString('hu-HU',{maximumFractionDigits:d})}
+const UNITS=[[1e30,'kvadrillió t'],[1e27,'trilliárd t'],[1e24,'trillió t'],[1e21,'billiárd t'],[1e18,'billió t'],[1e15,'milliárd t'],[1e12,'millió t'],[1e9,'ezer t'],[1e6,'t'],[1e3,'kg']];
+function fmt(g){if(!isFinite(g))return '∞';if(g>=1e33)return g.toExponential(2).replace('.',',')+' g';for(const [d,u] of UNITS){if(g>=d)return num(g/d)+' '+u}return num(g)+' g'}
+function int(v){return Math.floor(v).toLocaleString('hu-HU')}
+function x(v){return '×'+v.toLocaleString('hu-HU',{maximumFractionDigits:2})}
+
+// számítások
+function seasonIdx(){return Math.floor(S.season/SEASON_LEN)%5}
+function seasonLabel(i){const s=SEASONS[i],r=region(S.region);const o=r.rn&&r.rn[s.id];return o?{name:o[0],short:o[1],month:o[2]}:s}
+function seasonMult(i){
+  const s=SEASONS[i], r=region(S.region);
+  let m=(r.tw&&r.tw[s.id]!=null)?r.tw[s.id]:s.mult;
+  if(s.id==='tel'){if(S.up.teli)m+=0.5;m+=0.3*lv('hideg')}
+  else{if(S.up.naptar)m+=0.5;if(r.plus)m+=r.plus}
+  if(s.id==='repce'&&S.up.repce)m+=1;
+  if(s.id==='napraf'&&S.up.napraf)m+=1;
+  if(s.id==='akac'&&S.up.akac)m*=1.5;
+  if(s.id==='hars'&&S.up.hars)m*=1.5;
+  return m;
+}
+function avgSeason(){let t=0;for(let i=0;i<5;i++)t+=seasonMult(i);return t/5}
+function bm(b){let m=1;for(let k=1;k<=TIERS.length;k++)if(S.up['b_'+b.id+'_'+k])m*=2;return m}
+function pPer(){return 0.05+0.01*S.region}
+function globalMult(){
+  let m=(1+pPer()*S.pempo)*Math.pow(4,S.region)*Math.pow(1.1,lv('kiraly'));
+  if(S.up.propolisz)m*=1.5;if(S.up.mezbor)m*=1.5;if(S.up.viasz)m*=2;if(S.up.virpor)m*=2;if(S.up.harmat)m*=2;if(S.up.kirlep)m*=3;if(S.up.egbolt)m*=3;
+  if(S.up.beporzas)m*=1+0.1*Math.floor((S.owned.meh||0)/50);
+  return m;
+}
+function rawGps(){let t=0;for(const b of B)t+=(S.owned[b.id]||0)*b.rate*bm(b);return t}
+function baseGps(){return rawGps()*globalMult()}
+function gpsCalm(){return baseGps()*seasonMult(seasonIdx())}
+function gps(){return gpsCalm()*(frenzy>0?frenzyMult:1)}
+function tapVal(){const g=gps();return (S.up.fust?2:1)*(S.up.kanal?3:1)*(1+pPer()*S.pempo)*Math.pow(4,S.region)+g*((S.up.kesztyu?0.02:0)+(S.up.kalap?0.04:0)+(S.up.pergeto?0.08:0))}
+function combCap(){return Math.max(30,gpsCalm()*40)*Math.pow(0.85,lv('gyorslep'))}
+function sealRate(){return S.up.nagylep?1.5:S.up.fedel?0.6:0.25}
+function costOf(b,n){const o=S.owned[b.id]||0;return b.base*Math.pow(1.15,o)*(Math.pow(1.15,n)-1)/0.15}
+function maxN(b){const c0=b.base*Math.pow(1.15,S.owned[b.id]||0);return Math.max(0,Math.floor(Math.log(S.honey*0.15/c0+1)/Math.log(1.15)))}
+function uCost(u){return u.bcost!=null?u.bcost*(lv('tudas')?0.5:1):u.cost}
+function gainNow(){return Math.floor(Math.sqrt(S.run/1e6))}
+function regionReq(){return 15*Math.pow(4,S.region)}
+
+function add(v){S.honey+=v;S.run+=v;S.ever+=v}
+function fillComb(v){
+  S.comb+=v; const cap=combCap();
+  if(S.comb>=cap){
+    S.comb=0; const bonus=cap*sealRate(); add(bonus); S.sealed++; S.sealedEver++;
+    combBtn.classList.remove('sealed'); void combBtn.offsetWidth; combBtn.classList.add('sealed');
+    setTimeout(()=>combBtn.classList.remove('sealed'),700);
+    if(S.sealed<=3||S.sealed%10===0) toast('Lezárt lép: +'+fmt(bonus));
+  }
+}
+function newRun(keep){
+  S=Object.assign(fresh(),keep);
+  if(lv('szelid')){S.up.fust=true;S.up.kesztyu=true}
+  const k=lv('kezdes');if(k){S.owned.meh=10*k;S.owned.keret=5*k}
+  frenzy=0;
+}
+
+// lép (19 hatszög)
+const combBtn=document.getElementById('comb');
+const R=20, cells=[];
+(function buildComb(){
+  const pts=[];
+  for(let q=-2;q<=2;q++)for(let r=Math.max(-2,-q-2);r<=Math.min(2,-q+2);r++){
+    const px=R*Math.sqrt(3)*(q+r/2), py=R*1.5*r;
+    pts.push({x:px,y:py,d:Math.hypot(px,py),a:Math.atan2(py,px)});
+  }
+  pts.sort((p,q)=>(Math.round(p.d)-Math.round(q.d))||(p.a-q.a));
+  const hex=(cx,cy,rr)=>{let s='';for(let i=0;i<6;i++){const an=Math.PI/180*(60*i-30);s+=(cx+rr*Math.cos(an)).toFixed(2)+','+(cy+rr*Math.sin(an)).toFixed(2)+' '}return s.trim()};
+  let svg='<svg viewBox="-98 -90 196 180" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">';
+  pts.forEach((p,i)=>{svg+='<polygon class="c-empty" points="'+hex(p.x,p.y,R-1.5)+'"/><polygon class="c-honey" id="ch'+i+'" fill-opacity="0" points="'+hex(p.x,p.y,R-4.5)+'"/>'});
+  combBtn.innerHTML=svg+'</svg>';
+  for(let i=0;i<pts.length;i++)cells.push(document.getElementById('ch'+i));
+})();
+
+const wrapEl=document.getElementById('combWrap');
+function tap(px,py){const v=tapVal();add(v);fillComb(v);S.taps++;floater(px,py,'+'+fmt(v));renderTop()}
+combBtn.addEventListener('pointerdown',e=>{e.preventDefault();const r=wrapEl.getBoundingClientRect();tap(e.clientX-r.left,e.clientY-r.top)});
+combBtn.addEventListener('keydown',e=>{if(e.key===' '||e.key==='Enter'){e.preventDefault();const r=combBtn.getBoundingClientRect(),w=wrapEl.getBoundingClientRect();tap(r.left-w.left+r.width/2,r.top-w.top+r.height/2)}});
+function floater(px,py,txt){const f=document.createElement('span');f.className='float num';f.textContent=txt;f.style.left=px+'px';f.style.top=py+'px';wrapEl.appendChild(f);setTimeout(()=>f.remove(),950)}
+
+// raj
+function spawnSwarm(){
+  swarmEl=document.createElement('button');swarmEl.className='swarm';swarmEl.textContent='Raj érkezett!';
+  swarmEl.style.left=rnd(18,82)+'%';swarmEl.style.top=rnd(15,80)+'%';
+  swarmEl.addEventListener('pointerdown',e=>{e.preventDefault();catchSwarm()});
+  swarmEl.addEventListener('keydown',e=>{if(e.key===' '||e.key==='Enter'){e.preventDefault();catchSwarm()}});
+  wrapEl.appendChild(swarmEl);swarmLife=12;
+}
+function catchSwarm(){
+  if(!swarmEl)return;
+  const left=parseFloat(swarmEl.style.left)/100*wrapEl.clientWidth, top=parseFloat(swarmEl.style.top)/100*wrapEl.clientHeight;
+  swarmEl.remove();swarmEl=null;S.swarms++;
+  const dbl=S.up.rajmez?2:1;
+  if(gpsCalm()<=0||Math.random()<0.5){
+    const g=(gpsCalm()*90+tapVal()*30)*dbl;add(g);floater(left,top,'+'+fmt(g));toast('Befogtad a rajt: +'+fmt(g));
+  }else{
+    frenzyMult=S.up.rajmez?7:5;frenzy=20;toast('Virágzási láz: '+x(frenzyMult)+' termelés 20 másodpercig');
+  }
+  renderTop();
+}
+function swarmTick(dt){
+  if(swarmEl){swarmLife-=dt;if(swarmLife<=0){swarmEl.remove();swarmEl=null}return}
+  if(S.run<100)return;
+  swarmIn-=dt*(1+0.2*lv('rajcsal'))*(S.up.rajlada?2:1);
+  if(swarmIn<=0){swarmIn=rnd(90,180);spawnSwarm()}
+}
+
+// évszaksáv
+const track=document.getElementById('track');
+SEASONS.forEach(()=>{const d=document.createElement('div');d.className='seg';d.innerHTML='<div class="fill"></div><span></span>';track.appendChild(d)});
+const segs=[...track.children];
+
+// fülek
+const tabs=[['t-b','p-b'],['t-u','p-u'],['t-q','p-q']];
+tabs.forEach(([t,p])=>document.getElementById(t).addEventListener('click',()=>{
+  tabs.forEach(([t2,p2])=>{document.getElementById(t2).setAttribute('aria-selected',t2===t);document.getElementById(p2).hidden=p2!==p});
+  renderShop(true);renderQueen(true);
+}));
+document.querySelectorAll('.mode').forEach(m=>m.addEventListener('click',()=>{
+  buyMode=m.dataset.m;document.querySelectorAll('.mode').forEach(z=>z.setAttribute('aria-pressed',z===m));renderShop(true);
+}));
+const onTab=id=>document.getElementById(id).getAttribute('aria-selected')==='true';
+
+// bolt
+const bList=document.getElementById('bList'), uList=document.getElementById('uList'), uOwned=document.getElementById('uOwned');
+let shopSig='', seenUps=0;
+function visibleB(){let hi=-1;B.forEach((b,i)=>{if((S.owned[b.id]||0)>0||S.run>=b.base*0.5)hi=Math.max(hi,i)});return Math.max(1,hi+1)}
+function availUps(){return U.filter(u=>!S.up[u.id]&&u.need(S)).sort((a,b)=>uCost(a)-uCost(b))}
+function nextTier(b){const o=S.owned[b.id]||0;for(let k=0;k<TIERS.length;k++)if(o<TIERS[k])return TIERS[k];return null}
+
+function renderShop(force){
+  const vis=visibleB(), av=availUps();
+  const sig=vis+'|'+av.map(u=>u.id).join(',')+'|'+Object.keys(S.up).length+'|'+buyMode+'|'+lv('tudas')+'|'+S.region;
+  if(force||sig!==shopSig){
+    shopSig=sig;
+    let h='';
+    for(let i=0;i<Math.min(vis+1,B.length);i++){
+      const b=B[i];
+      if(i>=vis){h+='<div class="row locked"><div class="row-main"><div class="row-title"><span class="name">???</span></div><p class="desc">Gyűjts még, és kiderül.</p></div></div>';continue}
+      h+='<div class="row"><div class="row-main"><div class="row-title"><span class="name">'+b.name+'</span><span class="count num" id="bc-'+b.id+'"></span></div><p class="desc">'+b.desc+'</p><p class="meta num" id="bm-'+b.id+'"></p><p class="next-up num" id="bn-'+b.id+'"></p></div><button class="buy num" id="buy-'+b.id+'" data-b="'+b.id+'"></button></div>';
+    }
+    bList.innerHTML=h;
+    bList.querySelectorAll('[data-b]').forEach(btn=>btn.addEventListener('click',()=>buyB(btn.dataset.b)));
+    uList.innerHTML=av.length?av.map(u=>'<div class="row"><div class="row-main"><div class="row-title"><span class="name">'+u.name+'</span></div><p class="desc">'+u.desc+'</p></div><button class="buy num" id="up-'+u.id+'" data-u="'+u.id+'">'+fmt(uCost(u))+'</button></div>').join(''):'<p class="empty">Most nincs új fejlesztés. Építs tovább: minden épület 10, 25, 50, 100, 150, 200 és 300 darabnál újat nyit.</p>';
+    uList.querySelectorAll('[data-u]').forEach(btn=>btn.addEventListener('click',()=>buyU(btn.dataset.u)));
+    const own=U.filter(u=>S.up[u.id]);
+    document.getElementById('uOwnedHead').hidden=!own.length;
+    uOwned.innerHTML=own.map(u=>'<span class="chip">'+u.name+'</span>').join('');
+  }
+  for(let i=0;i<Math.min(vis,B.length);i++){
+    const b=B[i], btn=document.getElementById('buy-'+b.id); if(!btn)continue;
+    const o=S.owned[b.id]||0;
+    const n=buyMode==='max'?Math.max(1,maxN(b)):+buyMode;
+    const c=costOf(b,n);
+    btn.innerHTML=fmt(c)+'<small>'+n+' db</small>';
+    btn.disabled=S.honey<c;
+    document.getElementById('bc-'+b.id).textContent=o?o+' db':'';
+    const per=b.rate*bm(b)*globalMult();
+    document.getElementById('bm-'+b.id).textContent='+'+fmt(per)+' / mp darabonként'+(o?' · összesen '+fmt(per*o)+' / mp':'');
+    const nt=nextTier(b);
+    document.getElementById('bn-'+b.id).textContent=nt?'Következő fejlesztés '+nt+' db-nál':'Minden fejlesztés megnyitva';
+  }
+  av.forEach(u=>{const btn=document.getElementById('up-'+u.id);if(btn)btn.disabled=S.honey<uCost(u)});
+  if(onTab('t-u'))seenUps=av.length;
+  document.getElementById('upDot').hidden=onTab('t-u')||!(av.length>seenUps||av.some(u=>S.honey>=uCost(u)));
+}
+function buyB(id){
+  const b=B.find(z=>z.id===id);const n=buyMode==='max'?maxN(b):+buyMode;if(n<1)return;
+  const c=costOf(b,n);if(S.honey<c)return;S.honey-=c;S.owned[id]=(S.owned[id]||0)+n;renderShop(true);renderTop();save();
+}
+function buyU(id){
+  const u=U.find(z=>z.id===id);const c=uCost(u);if(S.up[id]||S.honey<c)return;S.honey-=c;S.up[id]=true;renderShop(true);renderTop();save();
+}
+
+// anyaméh, tulajdonságok, vidék
+const qBtn=document.getElementById('qBtn'), rBtn=document.getElementById('rBtn'), pList=document.getElementById('pList');
+let qArmed=false,qTimer,rArmed=false,rTimer;
+pList.innerHTML=P.map(p=>'<div class="row"><div class="row-main"><div class="row-title"><span class="name">'+p.name+'</span><span class="lvl num" id="pl-'+p.id+'"></span></div><p class="desc">'+p.desc+'</p></div><button class="buy num" id="pb-'+p.id+'" data-p="'+p.id+'"></button></div>').join('');
+pList.querySelectorAll('[data-p]').forEach(btn=>btn.addEventListener('click',()=>{
+  const p=P.find(z=>z.id===btn.dataset.p),l=lv(p.id);if(l>=p.max)return;const c=p.cost(l);if(S.pempo<c)return;
+  S.pempo-=c;S.perks[p.id]=l+1;
+  if(p.id==='szelid'){S.up.fust=true;S.up.kesztyu=true}
+  toast(p.name+(p.max>1?' · '+(l+1)+'. szint':''));renderQueen(true);renderShop(true);save();
+}));
+qBtn.addEventListener('click',()=>{
+  const g=gainNow();if(g<1)return;
+  if(!qArmed){qArmed=true;qBtn.textContent='Biztos? Koppints újra';clearTimeout(qTimer);qTimer=setTimeout(()=>{qArmed=false;renderQueen(true)},3500);return}
+  qArmed=false;clearTimeout(qTimer);
+  newRun({pempo:S.pempo+g,pempoRegion:S.pempoRegion+g,ever:S.ever,taps:S.taps,sealedEver:S.sealedEver,resets:S.resets+1,region:S.region,perks:S.perks,swarms:S.swarms});
+  toast('Új anya a kaptárban. +'+g+' méhpempő');
+  renderShop(true);renderTop();renderQueen(true);save();
+});
+rBtn.addEventListener('click',()=>{
+  if(S.pempoRegion<regionReq())return;
+  const nx=region(S.region+1);
+  if(!rArmed){rArmed=true;rBtn.textContent='Minden újraindul, a pempő is. Koppints újra.';clearTimeout(rTimer);rTimer=setTimeout(()=>{rArmed=false;renderQueen(true)},4000);return}
+  rArmed=false;clearTimeout(rTimer);
+  newRun({ever:S.ever,taps:S.taps,sealedEver:S.sealedEver,resets:S.resets,region:S.region+1,perks:S.perks,swarms:S.swarms});
+  toast('Megérkeztél: '+nx.name+'. Itt minden termelés '+x(Math.pow(4,S.region))+'.');
+  renderShop(true);renderTop();renderQueen(true);save();
+});
+function renderQueen(force){
+  const g=gainNow(), req=regionReq();
+  if(force||!document.getElementById('p-q').hidden){
+    document.getElementById('qHave').textContent=int(S.pempo);
+    document.getElementById('qBonus').textContent='+'+Math.round(S.pempo*pPer()*100).toLocaleString('hu-HU')+'%';
+    document.getElementById('qGain').textContent=int(g);
+    document.getElementById('qNext').textContent=fmt(Math.pow(g+1,2)*1e6);
+    if(!qArmed){qBtn.disabled=g<1;qBtn.textContent=g<1?'Még nem elég erős a család':'Anyaméh nevelése · +'+int(g)}
+    P.forEach(p=>{
+      const l=lv(p.id),btn=document.getElementById('pb-'+p.id),max=l>=p.max;
+      document.getElementById('pl-'+p.id).textContent=p.max===1?(l?'megvan':''):(l+(p.max===Infinity?'. szint':' / '+p.max));
+      if(max){btn.disabled=true;btn.innerHTML='Kész'}else{const c=p.cost(l);btn.disabled=S.pempo<c;btn.innerHTML=int(c)+'<small>pempő</small>'}
+    });
+    let m='';const shown=Math.max(REGIONS.length,S.region+2);
+    for(let i=0;i<shown;i++)m+='<span class="'+(i<S.region?'done':i===S.region?'here':'')+'">'+region(i).name+'</span>';
+    document.getElementById('rMap').innerHTML=m;
+    const nx=region(S.region+1);
+    document.getElementById('rNext').textContent='Következő: '+nx.name+'. '+nx.desc+' Ott minden termelés '+x(Math.pow(4,S.region+1))+', a pempő pedig '+Math.round((pPer()+0.01)*100)+'%-ot ér. A költözés mindent újraindít, a méhpempőt is; a tulajdonságok maradnak.';
+    document.getElementById('rBar').style.width=Math.min(100,S.pempoRegion/req*100).toFixed(1)+'%';
+    document.getElementById('rProg').textContent='Ezen a vidéken nevelt pempő: '+int(S.pempoRegion)+' / '+int(req);
+    if(!rArmed){rBtn.disabled=S.pempoRegion<req;rBtn.textContent='Költözés: '+nx.name}
+    document.getElementById('stEver').textContent=fmt(S.ever);
+    document.getElementById('stRun').textContent=fmt(S.run);
+    document.getElementById('stTaps').textContent=int(S.taps);
+    document.getElementById('stSealed').textContent=int(S.sealedEver);
+    document.getElementById('stSwarms').textContent=int(S.swarms);
+    document.getElementById('stResets').textContent=int(S.resets);
+  }
+  document.getElementById('qDot').hidden=onTab('t-q')||!(g>=Math.max(1,Math.ceil(S.pempo*0.25))||S.pempoRegion>=req);
+}
+let hrArmed=false;
+document.getElementById('hardReset').addEventListener('click',e=>{
+  const el=e.currentTarget;
+  if(!hrArmed){hrArmed=true;el.textContent='Minden törlődik: vidék, pempő, tulajdonságok. Koppints újra.';setTimeout(()=>{hrArmed=false;el.textContent='Teljes újrakezdés'},4000);return}
+  hrArmed=false;S=fresh();frenzy=0;el.textContent='Teljes újrakezdés';renderShop(true);renderTop();renderQueen(true);save();toast('Üres méhes, tiszta lap.');
+});
+
+// felső sáv
+const $h=document.getElementById('honey'),$g=document.getElementById('gps'),$t=document.getElementById('tapv'),$f=document.getElementById('frenzyTag');
+function renderTop(){
+  $h.textContent=fmt(S.honey);$g.textContent=fmt(gps());$t.textContent=fmt(tapVal());
+  $f.hidden=frenzy<=0;if(frenzy>0)$f.textContent='Virágzási láz '+x(frenzyMult)+' · '+Math.ceil(frenzy)+' mp';
+  combBtn.classList.toggle('frenzy',frenzy>0);
+  const i=seasonIdx(), lab=seasonLabel(i), frac=(S.season%SEASON_LEN)/SEASON_LEN;
+  document.getElementById('sName').textContent=lab.name;
+  document.getElementById('sMonth').textContent=lab.month;
+  document.getElementById('sMult').textContent=x(seasonMult(i));
+  segs.forEach((el,k)=>{el.classList.toggle('now',k===i);el.classList.toggle('past',k<i);el.firstChild.style.width=k===i?(frac*100).toFixed(1)+'%':(k<i?'100%':'0');el.lastChild.textContent=seasonLabel(k).short});
+  const cap=combCap(), fill=S.comb/cap*cells.length;
+  cells.forEach((c,k)=>c.setAttribute('fill-opacity',Math.max(0,Math.min(1,fill-k)).toFixed(2)));
+  document.getElementById('combCap').textContent='Lép: '+Math.floor(S.comb/cap*100)+'% · lezárva +'+fmt(cap*sealRate());
+  document.getElementById('tag').textContent=region(S.region).name+(S.pempo?' · '+int(S.pempo)+' pempő':'');
+}
+
+function toast(msg){const t=document.createElement('div');t.className='toast';t.textContent=msg;document.getElementById('toasts').appendChild(t);setTimeout(()=>t.remove(),2800)}
+
+// mentés
+function save(){S.last=Date.now();try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function normalize(d){const s=Object.assign(fresh(),d);s.owned=d.owned||{};s.up=d.up||{};s.perks=d.perks||{};if(d.pempoRegion==null)s.pempoRegion=s.pempo||0;return s}
+function load(){try{const raw=localStorage.getItem(KEY);if(raw)S=normalize(JSON.parse(raw))}catch(e){S=fresh()}}
+function catchUp(){
+  const secs=Math.min((Date.now()-S.last)/1000,12*3600);
+  if(secs>10){
+    const g=baseGps()*avgSeason()*secs;
+    S.season=(S.season+secs)%(SEASON_LEN*5);
+    if(g>0){add(g);toast('Amíg távol voltál, a méhek gyűjtöttek: +'+fmt(g))}
+  }
+  S.last=Date.now();
+}
+
+// ciklus
+let lastT=performance.now(), acc=0, saveAcc=0;
+function frame(now){
+  const dt=Math.min((now-lastT)/1000,1);lastT=now;
+  S.season=(S.season+dt)%(SEASON_LEN*5);
+  if(frenzy>0)frenzy=Math.max(0,frenzy-dt);
+  const g=gps()*dt; if(g>0){add(g);fillComb(g)}
+  swarmTick(dt);
+  S.last=Date.now();
+  acc+=dt;saveAcc+=dt;
+  if(acc>=0.1){acc=0;renderTop();renderShop(false);renderQueen(false)}
+  if(saveAcc>=5){saveAcc=0;save()}
+  requestAnimationFrame(frame);
+}
+document.addEventListener('visibilitychange',()=>{if(document.hidden)save();else{catchUp();lastT=performance.now()}});
+window.addEventListener('pagehide',save);
+
+function start(data){
+  if(data&&data.state){S=normalize(data.state)}else{load();catchUp()}
+  try{window.claude?.hot?.snapshot?.(()=>({state:S}))}catch(e){}
+  renderShop(true);renderTop();renderQueen(true);
+  requestAnimationFrame(t=>{lastT=t;requestAnimationFrame(frame)});
+}
+window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
+})();
+</script>
+
+</body></html>
