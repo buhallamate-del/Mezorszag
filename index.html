@@ -116,6 +116,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:1
 .stats{margin-top:18px;display:grid;gap:6px;font-size:13px;color:var(--muted)}
 .stats div{display:flex;justify-content:space-between;gap:10px;border-bottom:1px dashed var(--line);padding-bottom:5px}
 .stats b{color:var(--ink)}
+.univ{margin-top:18px;padding:14px;border:1px solid #7a5cff;border-radius:12px;background:rgba(122,92,255,.06);font-size:13.5px;line-height:1.45}.univ h3{margin:0 0 4px;font:400 18px var(--f-display);color:#5b3fd6}.univ p{margin:6px 0;color:var(--muted)}.univ a{display:inline-block;margin:6px 8px 0 0;padding:7px 11px;border-radius:9px;border:1px solid #7a5cff;color:#5b3fd6;text-decoration:none;font-weight:700}
 .reset{appearance:none;background:none;border:0;color:var(--muted);text-decoration:underline;font:600 12.5px var(--f-body);cursor:pointer;padding:8px 0;margin-top:6px}
 
 .toasts{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);display:grid;gap:6px;z-index:10;width:min(92vw,420px);pointer-events:none}
@@ -199,6 +200,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:1
       <div><span>Elkapott rajok</span><b id="stSwarms">0</b></div>
       <div><span>Nevelt anyák</span><b id="stResets">0</b></div>
     </div>
+    <div class="univ" id="univKartya" hidden></div>
     <button class="reset" id="hardReset">Teljes újrakezdés</button>
   </section>
 </div>
@@ -280,6 +282,15 @@ const P = [
 const KEY='mezorszag:v1';
 function fresh(){return {honey:0,run:0,ever:0,taps:0,sealed:0,sealedEver:0,owned:{},up:{},pempo:0,pempoRegion:0,season:0,comb:0,last:Date.now(),resets:0,region:0,perks:{},swarms:0}}
 let S = fresh();
+// Közös napló a játékaim között (Eseményhorizont, Kísérleti Lőtér, Raktár 3D, Égtorony, Mézország). Mind ugyanazon a
+// webcímen fut (buhallamate-del.github.io), ezért a böngésző tárhelye közös: amit az egyikben elérsz, a másik is látja.
+const UNIV_KEY='univerzum-naplo';
+const univ={
+  get(){try{return JSON.parse(localStorage.getItem(UNIV_KEY))||{}}catch(_){return {}}},
+  has(k){return !!this.get()[k]},
+  set(k){const n=this.get();if(n[k])return false;n[k]=Date.now();try{localStorage.setItem(UNIV_KEY,JSON.stringify(n))}catch(_){}return true},
+};
+univ.set('mo:jart');
 let buyMode='1', frenzy=0, frenzyMult=1, swarmIn=rnd(60,120), swarmEl=null, swarmLife=0;
 
 function rnd(a,b){return a+Math.random()*(b-a)}
@@ -379,7 +390,7 @@ function spawnSwarm(){
 function catchSwarm(){
   if(!swarmEl)return;
   const left=parseFloat(swarmEl.style.left)/100*wrapEl.clientWidth, top=parseFloat(swarmEl.style.top)/100*wrapEl.clientHeight;
-  swarmEl.remove();swarmEl=null;S.swarms++;
+  swarmEl.remove();swarmEl=null;S.swarms++;univ.set('mo:raj');
   const dbl=S.up.rajmez?2:1;
   if(gpsCalm()<=0||Math.random()<0.5){
     const g=(gpsCalm()*90+tapVal()*30)*dbl;add(g);floater(left,top,'+'+fmt(g));toast('Befogtad a rajt: +'+fmt(g));
@@ -456,7 +467,7 @@ function renderShop(force){
 }
 function buyB(id){
   const b=B.find(z=>z.id===id);const n=buyMode==='max'?maxN(b):+buyMode;if(n<1)return;
-  const c=costOf(b,n);if(S.honey<c)return;S.honey-=c;S.owned[id]=(S.owned[id]||0)+n;renderShop(true);renderTop();save();
+  const c=costOf(b,n);if(S.honey<c)return;S.honey-=c;S.owned[id]=(S.owned[id]||0)+n;if(id==='egi'&&univ.set('mo:csillag'))toast('A csillagméhek egy távoli, fénylő pont felé indultak…');renderShop(true);renderTop();save();
 }
 function buyU(id){
   const u=U.find(z=>z.id===id);const c=uCost(u);if(S.up[id]||S.honey<c)return;S.honey-=c;S.up[id]=true;renderShop(true);renderTop();save();
@@ -477,7 +488,7 @@ qBtn.addEventListener('click',()=>{
   if(!qArmed){qArmed=true;qBtn.textContent='Biztos? Koppints újra';clearTimeout(qTimer);qTimer=setTimeout(()=>{qArmed=false;renderQueen(true)},3500);return}
   qArmed=false;clearTimeout(qTimer);
   newRun({pempo:S.pempo+g,pempoRegion:S.pempoRegion+g,ever:S.ever,taps:S.taps,sealedEver:S.sealedEver,resets:S.resets+1,region:S.region,perks:S.perks,swarms:S.swarms});
-  toast('Új anya a kaptárban. +'+g+' méhpempő');
+  univ.set('mo:anya');toast('Új anya a kaptárban. +'+g+' méhpempő');
   renderShop(true);renderTop();renderQueen(true);save();
 });
 rBtn.addEventListener('click',()=>{
@@ -486,7 +497,7 @@ rBtn.addEventListener('click',()=>{
   if(!rArmed){rArmed=true;rBtn.textContent='Minden újraindul, a pempő is. Koppints újra.';clearTimeout(rTimer);rTimer=setTimeout(()=>{rArmed=false;renderQueen(true)},4000);return}
   rArmed=false;clearTimeout(rTimer);
   newRun({ever:S.ever,taps:S.taps,sealedEver:S.sealedEver,resets:S.resets,region:S.region+1,perks:S.perks,swarms:S.swarms});
-  toast('Megérkeztél: '+nx.name+'. Itt minden termelés '+x(Math.pow(4,S.region))+'.');
+  univ.set('mo:videk');if(S.region>=6)univ.set('mo:karpatok');toast('Megérkeztél: '+nx.name+'. Itt minden termelés '+x(Math.pow(4,S.region))+'.');
   renderShop(true);renderTop();renderQueen(true);save();
 });
 function renderQueen(force){
@@ -517,6 +528,7 @@ function renderQueen(force){
     document.getElementById('stSwarms').textContent=int(S.swarms);
     document.getElementById('stResets').textContent=int(S.resets);
   }
+  univKartya();
   document.getElementById('qDot').hidden=onTab('t-q')||!(g>=Math.max(1,Math.ceil(S.pempo*0.25))||S.pempoRegion>=req);
 }
 let hrArmed=false;
@@ -543,6 +555,27 @@ function renderTop(){
   document.getElementById('tag').textContent=region(S.region).name+(S.pempo?' · '+int(S.pempo)+' pempő':'');
 }
 
+// Más világok: a többi játékom, ha már jártál bennük; egyszeri ajándékok a közös naplóból
+const VILAGOK=[
+  ['eh:jart','Eseményhorizont','../Esemenyhorizont/','Egy fekete lyuk körül keringő hajó. A csillagméhek oda tartanak, ahol a fény is elhajlik.'],
+  ['lo:jart','Kísérleti Lőtér','../Kiserleti_robbantas/','Egy rakétaprogram 1957-ből. A kilövőállás melletti akácos a legjobb legelő az országban.'],
+  ['r3:jart','Raktár 3D','../raktar-3d/','Egy raktár, ahol a mézes üvegek is tárhelyet kapnak.'],
+  ['eg:jart','Égtorony','../Egtorony/','Egy torony, amely a felhők fölé nő. A tetején más virágok nyílnak.'],
+];
+let univSzoveg='';
+function univKartya(){
+  const el=document.getElementById('univKartya');if(!el)return;
+  const n=univ.get(),jart=VILAGOK.filter(v=>n[v[0]]);
+  // egyszeri ajándékok: méhpempő más világok mérföldköveiért (a Teljes újrakezdés után is csak egyszer)
+  const ajandek=[['lo:orbit',3,'A lőtér műholdja új, virágzó dűlőket fényképezett: +3 méhpempő.'],['eh:horizont',5,'Egy eseményhorizont mögül édes, időtlen fény szivárog: +5 méhpempő.'],['eg:sziv',5,'Az Égtorony Szívének legyőzése után égi virágpor hullik: +5 méhpempő.']];
+  for(const [k,db,sz] of ajandek)if(n[k]&&univ.set('mo:ajandek:'+k)){S.pempo+=db;toast(sz);save()}
+  if(!jart.length&&!n['mo:csillag']){el.hidden=true;return}
+  const h='<h3>Más világok</h3>'+(n['mo:csillag']?'<p>A csillagméhek egy távoli, fénylő pont felé repülnek. Mintha tudnák, hogy máshol is van élet.</p>':'')
+    +jart.map(v=>'<p><b>'+v[1]+'.</b> '+v[3]+'</p>').join('')
+    +VILAGOK.filter(v=>n[v[0]]||(v[0]==='eh:jart'&&n['mo:csillag'])).map(v=>'<a href="'+v[2]+'">'+v[1]+' ↗</a>').join('');
+  if(h!==univSzoveg){univSzoveg=h;el.innerHTML=h}
+  el.hidden=false;
+}
 function toast(msg){const t=document.createElement('div');t.className='toast';t.textContent=msg;document.getElementById('toasts').appendChild(t);setTimeout(()=>t.remove(),2800)}
 
 // mentés
