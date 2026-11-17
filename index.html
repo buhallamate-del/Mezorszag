@@ -117,6 +117,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:1
 .stats div{display:flex;justify-content:space-between;gap:10px;border-bottom:1px dashed var(--line);padding-bottom:5px}
 .stats b{color:var(--ink)}
 .univ{margin-top:18px;padding:14px;border:1px solid #7a5cff;border-radius:12px;background:rgba(122,92,255,.06);font-size:13.5px;line-height:1.45}.univ h3{margin:0 0 4px;font:400 18px var(--f-display);color:#5b3fd6}.univ p{margin:6px 0;color:var(--muted)}.univ a{display:inline-block;margin:6px 8px 0 0;padding:7px 11px;border-radius:9px;border:1px solid #7a5cff;color:#5b3fd6;text-decoration:none;font-weight:700}
+.verseny{border-color:#c98a12;background:rgba(201,138,18,.07)}.verseny h3{color:#8a5a00}.vtab{width:100%;border-collapse:collapse;font-size:13px;margin:6px 0}.vtab td,.vtab th{padding:4px 3px;border-bottom:1px dashed var(--line);text-align:left}.vtab th{color:var(--muted);font-weight:600}.vtab tr.en td{color:#8a5a00;font-weight:700}.vtab td.sz{text-align:right;white-space:nowrap}.vnev{display:flex;gap:6px;margin:8px 0}.vnev input{flex:1;padding:7px 9px;border:1px solid var(--line);border-radius:8px;font:600 13.5px var(--f-body);background:var(--bg);color:var(--ink)}.vnev button{padding:7px 11px;border-radius:8px;border:1px solid #c98a12;background:none;color:#8a5a00;font-weight:700}.fent{display:inline-block;font-size:11px;padding:1px 6px;border-radius:8px;background:#d7ecd0;color:#2e6b1f;margin-left:4px}
 .reset{appearance:none;background:none;border:0;color:var(--muted);text-decoration:underline;font:600 12.5px var(--f-body);cursor:pointer;padding:8px 0;margin-top:6px}
 
 .toasts{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);display:grid;gap:6px;z-index:10;width:min(92vw,420px);pointer-events:none}
@@ -200,6 +201,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:1
       <div><span>Elkapott rajok</span><b id="stSwarms">0</b></div>
       <div><span>Nevelt anyák</span><b id="stResets">0</b></div>
     </div>
+    <div class="univ verseny" id="versenyKartya"></div>
     <div class="univ" id="univKartya" hidden></div>
     <button class="reset" id="hardReset">Teljes újrakezdés</button>
   </section>
@@ -291,6 +293,9 @@ const univ={
   set(k){const n=this.get();if(n[k])return false;n[k]=Date.now();try{localStorage.setItem(UNIV_KEY,JSON.stringify(n))}catch(_){}return true},
 };
 univ.set('mo:jart');
+// ha az Eseményhorizont buborékjában futunk, az oda vezető kapu nem tölti be újra, csak visszaszól
+function univBeagyazva(){try{return window.parent!==window&&window.parent.location.origin===location.origin}catch(_){return false}}
+document.addEventListener('click',e=>{const a=e.target.closest&&e.target.closest('a[href*="Esemenyhorizont"]');if(a&&univBeagyazva()){e.preventDefault();window.parent.postMessage({type:'univ-vissza',from:'mezorszag'},location.origin)}});
 let buyMode='1', frenzy=0, frenzyMult=1, swarmIn=rnd(60,120), swarmEl=null, swarmLife=0;
 
 function rnd(a,b){return a+Math.random()*(b-a)}
@@ -467,7 +472,7 @@ function renderShop(force){
 }
 function buyB(id){
   const b=B.find(z=>z.id===id);const n=buyMode==='max'?maxN(b):+buyMode;if(n<1)return;
-  const c=costOf(b,n);if(S.honey<c)return;S.honey-=c;S.owned[id]=(S.owned[id]||0)+n;if(id==='egi'&&univ.set('mo:csillag'))toast('A csillagméhek egy távoli, fénylő pont felé indultak…');renderShop(true);renderTop();save();
+  const c=costOf(b,n);if(S.honey<c)return;S.honey-=c;S.owned[id]=(S.owned[id]||0)+n;if(id==='egi'&&S.owned.egi===n)VS.hir('megépítette az első Csillagméhest!');if(id==='egi'&&univ.set('mo:csillag'))toast('A csillagméhek egy távoli, fénylő pont felé indultak…');renderShop(true);renderTop();save();
 }
 function buyU(id){
   const u=U.find(z=>z.id===id);const c=uCost(u);if(S.up[id]||S.honey<c)return;S.honey-=c;S.up[id]=true;renderShop(true);renderTop();save();
@@ -497,7 +502,7 @@ rBtn.addEventListener('click',()=>{
   if(!rArmed){rArmed=true;rBtn.textContent='Minden újraindul, a pempő is. Koppints újra.';clearTimeout(rTimer);rTimer=setTimeout(()=>{rArmed=false;renderQueen(true)},4000);return}
   rArmed=false;clearTimeout(rTimer);
   newRun({ever:S.ever,taps:S.taps,sealedEver:S.sealedEver,resets:S.resets,region:S.region+1,perks:S.perks,swarms:S.swarms});
-  univ.set('mo:videk');if(S.region>=6)univ.set('mo:karpatok');toast('Megérkeztél: '+nx.name+'. Itt minden termelés '+x(Math.pow(4,S.region))+'.');
+  univ.set('mo:videk');VS.hir('átköltözött ide: '+nx.name+'.');setTimeout(()=>VS.kozol(),50);if(S.region>=6)univ.set('mo:karpatok');toast('Megérkeztél: '+nx.name+'. Itt minden termelés '+x(Math.pow(4,S.region))+'.');
   renderShop(true);renderTop();renderQueen(true);save();
 });
 function renderQueen(force){
@@ -557,7 +562,7 @@ function renderTop(){
 
 // Más világok: a többi játékom, ha már jártál bennük; egyszeri ajándékok a közös naplóból
 const VILAGOK=[
-  ['eh:jart','Eseményhorizont','../Esemenyhorizont/','Egy fekete lyuk körül keringő hajó. A csillagméhek oda tartanak, ahol a fény is elhajlik.'],
+  ['eh:jart','Eseményhorizont','../Esemenyhorizont/?from=mezorszag','Egy fekete lyuk körül keringő hajó. A csillagméhek oda tartanak, ahol a fény is elhajlik.'],
   ['lo:jart','Kísérleti Lőtér','../Kiserleti_robbantas/','Egy rakétaprogram 1957-ből. A kilövőállás melletti akácos a legjobb legelő az országban.'],
   ['r3:jart','Raktár 3D','../raktar-3d/','Egy raktár, ahol a mézes üvegek is tárhelyet kapnak.'],
   ['eg:jart','Égtorony','../Egtorony/','Egy torony, amely a felhők fölé nő. A tetején más virágok nyílnak.'],
@@ -567,7 +572,7 @@ function univKartya(){
   const el=document.getElementById('univKartya');if(!el)return;
   const n=univ.get(),jart=VILAGOK.filter(v=>n[v[0]]);
   // egyszeri ajándékok: méhpempő más világok mérföldköveiért (a Teljes újrakezdés után is csak egyszer)
-  const ajandek=[['lo:orbit',3,'A lőtér műholdja új, virágzó dűlőket fényképezett: +3 méhpempő.'],['eh:horizont',5,'Egy eseményhorizont mögül édes, időtlen fény szivárog: +5 méhpempő.'],['eg:sziv',5,'Az Égtorony Szívének legyőzése után égi virágpor hullik: +5 méhpempő.']];
+  const ajandek=[['eh:egg:mezorszag',5,'Egy fekete lyuk mögötti buborékban rátaláltak a méhesedre: +5 méhpempő.'],['lo:orbit',3,'A lőtér műholdja új, virágzó dűlőket fényképezett: +3 méhpempő.'],['eh:horizont',5,'Egy eseményhorizont mögül édes, időtlen fény szivárog: +5 méhpempő.'],['eg:sziv',5,'Az Égtorony Szívének legyőzése után égi virágpor hullik: +5 méhpempő.']];
   for(const [k,db,sz] of ajandek)if(n[k]&&univ.set('mo:ajandek:'+k)){S.pempo+=db;toast(sz);save()}
   if(!jart.length&&!n['mo:csillag']){el.hidden=true;return}
   const h='<h3>Más világok</h3>'+(n['mo:csillag']?'<p>A csillagméhek egy távoli, fénylő pont felé repülnek. Mintha tudnák, hogy máshol is van élet.</p>':'')
@@ -575,6 +580,72 @@ function univKartya(){
     +VILAGOK.filter(v=>n[v[0]]||(v[0]==='eh:jart'&&n['mo:csillag'])).map(v=>'<a href="'+v[2]+'">'+v[1]+' ↗</a>').join('');
   if(h!==univSzoveg){univSzoveg=h;el.innerHTML=h}
   el.hidden=false;
+}
+// ---- Multiverzum-bajnokság: heti rangsor más játékosokkal ----
+// Egy nyilvános MQTT üzenetközvetítőn (HiveMQ, mint a Raktár 3D-ben és a Lőtér Űrversenyében) megy át a játékosok
+// neve és heti eredménye; saját szerver nincs. Témák (VS_CS/...):
+//   <játék>/<hét>/<azonosító>  – megőrzött heti eredmény: {id, nev, v:{...}, ts}
+//   jelen/<játék>/<azonosító>  – megőrzött jelenlét (a kapcsolat megszakadásakor a szerver törli)
+//   <játék>/e                  – élő hírek: {id, nev, t}
+// Hétfőn új hét, új rangsor; az előző hét győztese (ha legalább ketten versenyeztek) egyszeri jutalmat kap.
+const VS_BROKER='wss://broker.hivemq.com:8884/mqtt',VS_CS='multiverzum-bajnoksag-r4w8';
+function vsHet(d=new Date()){const t=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())),n=t.getUTCDay()||7;t.setUTCDate(t.getUTCDate()+4-n);
+  const e=t.getUTCFullYear();return e+'-W'+String(Math.ceil(((t-Date.UTC(e,0,1))/864e5+1)/7)).padStart(2,'0')}
+function inditVerseny({jatek,ertek,rendez,jutalom,valtozott}){
+  const id=(()=>{let i;try{i=localStorage.getItem('multiverzum-id')}catch(e){}if(!i){i=Math.random().toString(36).slice(2,10);try{localStorage.setItem('multiverzum-id',i)}catch(e){}}return i})();
+  const V={be:false,het:vsHet(),lap:{},elozo:{},jelen:{},hirek:[],k:null,kuld:'',uz:'Kapcsolódás…',id};
+  V.elozoHet=vsHet(new Date(Date.now()-7*864e5));
+  V.nev=()=>{try{return localStorage.getItem('multiverzum-nev')||''}catch(e){return ''}};
+  V.nevBe=n=>{n=String(n||'').trim().slice(0,24);try{localStorage.setItem('multiverzum-nev',n)}catch(e){}V.kuld='';V.kozol();jelenKuld()};
+  const tiszta=o=>o&&typeof o.id==='string'&&o.v&&typeof o.v==='object'?{id:o.id,nev:String(o.nev||'?').slice(0,24),v:o.v,ts:+o.ts||0}:null;
+  V.rangsor=(L=V.lap,sajat=true)=>{const l={...L};if(sajat){const v=ertek();if(v)l[id]={id,nev:V.nev()||'Névtelen',v,ts:Date.now()}}
+    return Object.values(l).filter(Boolean).map(x=>({...x,en:x.id===id})).filter(x=>x.en||Object.values(x.v).some(v=>+v>0)).sort((a,b)=>rendez(a.v,b.v))};
+  const jt=()=>VS_CS+'/jelen/'+jatek+'/'+id;
+  function jelenKuld(){if(V.be)V.k.publish(jt(),JSON.stringify({nev:V.nev()||'Névtelen'}),{qos:0,retain:true})}
+  V.kozol=()=>{if(!V.be||!V.nev())return;const v=ertek();if(!v)return;const s=JSON.stringify(v);if(s===V.kuld)return;V.kuld=s;
+    V.k.publish(VS_CS+'/'+jatek+'/'+V.het+'/'+id,JSON.stringify({id,nev:V.nev(),v,ts:Date.now()}),{qos:0,retain:true})};
+  V.hir=t=>{if(V.be&&V.nev())V.k.publish(VS_CS+'/'+jatek+'/e',JSON.stringify({id,nev:V.nev(),t:String(t).slice(0,140)}),{qos:0})};
+  V.fent=()=>Object.keys(V.jelen).length;
+  // az előző hét győztese: egyszer, ha mi voltunk az elsők (és nem egyedül)
+  let bajnokNezve=false;
+  function bajnokCsekk(){if(bajnokNezve)return;const R=V.rangsor(V.elozo,false);if(R.length<2||R[0].id!==id)return;bajnokNezve=true;
+    let n={};try{n=JSON.parse(localStorage.getItem('univerzum-naplo'))||{}}catch(e){}const k=jatek+':bajnok:'+V.elozoHet;if(n[k])return;
+    n[k]=Date.now();try{localStorage.setItem('univerzum-naplo',JSON.stringify(n))}catch(e){}jutalom(V.elozoHet,R.length)}
+  (async()=>{let mqtt;try{const mod=await import('./vendor/mqtt/mqtt.esm.js');mqtt=mod.default?.connect?mod.default:mod.default?.default??mod}catch(e){V.uz='A versenyhez nem sikerült betölteni a hálózati könyvtárat.';valtozott();return}
+    V.k=mqtt.connect(VS_BROKER,{clientId:jatek+'_'+id+'_'+Math.random().toString(36).slice(2,6),clean:true,keepalive:30,reconnectPeriod:5000,connectTimeout:10000,will:{topic:jt(),payload:'',qos:0,retain:true}});
+    V.k.on('connect',()=>{V.be=true;V.uz='';V.het=vsHet();V.k.subscribe(VS_CS+'/'+jatek+'/'+V.het+'/+');V.k.subscribe(VS_CS+'/'+jatek+'/'+V.elozoHet+'/+');
+      V.k.subscribe(VS_CS+'/jelen/'+jatek+'/+');V.k.subscribe(VS_CS+'/'+jatek+'/e');jelenKuld();V.kuld='';V.kozol();valtozott();setTimeout(bajnokCsekk,4000)});
+    V.k.on('close',()=>{if(V.be){V.be=false;V.uz='A kapcsolat megszakadt, újrapróbálom…';valtozott()}});
+    V.k.on('error',e=>console.warn('[verseny]',e?.message||e));
+    V.k.on('message',(tema,adat)=>{const r=tema.slice(VS_CS.length+1).split('/');let o=null;try{const s=adat.toString();o=s?JSON.parse(s):null}catch(e){return}
+      if(r[0]==='jelen'){if(r[2]===id)return;if(o)V.jelen[r[2]]=String(o.nev||'?').slice(0,24);else delete V.jelen[r[2]]}
+      else if(r[1]==='e'){if(!o||o.id===id)return;V.hirek.unshift({nev:String(o.nev||'?').slice(0,24),t:String(o.t||'').slice(0,140),ido:Date.now()});V.hirek.length=Math.min(V.hirek.length,6);valtozott(V.hirek[0]);return}
+      else if(r[1]===V.het||r[1]===V.elozoHet){if(r[2]===id&&r[1]===V.het)return;const L=r[1]===V.het?V.lap:V.elozo;const x=tiszta(o);if(x&&x.id===r[2])L[r[2]]=x;else delete L[r[2]]}
+      valtozott()})})();
+  return V}
+
+// a Mézország heti versenye: ki gyűjt több mézet a héten (minden kaptárban, anyaváltáson és költözésen át)
+const VS_TAR='mezorszag:verseny';
+let vsAllas=(()=>{try{return JSON.parse(localStorage.getItem(VS_TAR))||{}}catch(e){return {}}})();
+function vsHetiMez(){const h=vsHet();if(vsAllas.het!==h||!(vsAllas.alap<=S.ever)){vsAllas={het:h,alap:S.ever,raj:S.swarms};try{localStorage.setItem(VS_TAR,JSON.stringify(vsAllas))}catch(e){}}
+  return {m:Math.max(0,S.ever-vsAllas.alap),r:S.region,j:Math.max(0,S.swarms-(vsAllas.raj||0))}}
+const VS=inditVerseny({jatek:'mo',ertek:vsHetiMez,rendez:(a,b)=>(+b.m||0)-(+a.m||0),
+  jutalom:(het,db)=>{S.pempo+=10;save();toast('🏆 A múlt heti mézverseny győztese te lettél ('+db+' méhész közül): +10 méhpempő!')},
+  valtozott:h=>{if(h&&h.t)toast('🐝 '+h.nev+' '+h.t);versenyKartya(true)}});
+let vsKozolT=0,vsHtml='';
+window.mezorszag={get S(){return S},VS}; // hibakereséshez
+function versenyKartya(force){
+  const el=document.getElementById('versenyKartya');if(!el)return;
+  if(!force&&document.getElementById('p-q').hidden)return;
+  if(el.contains(document.activeElement))return; // gépelés közben nem rajzoljuk újra
+  const R=VS.rangsor(),hely=R.findIndex(x=>x.en)+1,esc2=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  let h='<h3>Heti mézverseny</h3><p>'+(VS.be?(VS.fent()+1)+' méhész van most fent. ':VS.uz+' ')+'Ki gyűjt a héten több mézet? Hétfőn új verseny indul, a múlt heti győztes +10 méhpempőt kap.</p>';
+  if(!VS.nev())h+='<div class="vnev"><input id="vsNev" maxlength="24" placeholder="A méhészeted neve"><button id="vsNevOk">Beszállok</button></div>';
+  h+='<table class="vtab"><tr><th>#</th><th>Méhész</th><th>Vidék</th><th class="sz">Heti méz</th></tr>'+R.slice(0,8).map((x,i)=>'<tr class="'+(x.en?'en':'')+'"><td>'+(i+1)+'</td><td>'+esc2(x.nev)+(x.en?' (te)':'')+(VS.jelen[x.id]&&!x.en?'<span class="fent">fent</span>':'')+'</td><td>'+esc2(region(+x.v.r||0).name)+'</td><td class="sz">'+fmt(+x.v.m||0)+'</td></tr>').join('')+'</table>';
+  if(hely&&R.length>1)h+='<p><b>'+hely+'. hely</b> a '+R.length+' méhész közül.</p>';
+  if(VS.hirek.length)h+=VS.hirek.slice(0,3).map(x=>'<p>🐝 '+esc2(x.nev)+' '+esc2(x.t)+'</p>').join('');
+  if(h===vsHtml)return;vsHtml=h;el.innerHTML=h;
+  const ok=document.getElementById('vsNevOk');if(ok)ok.onclick=()=>{const v=document.getElementById('vsNev').value.trim();if(v){VS.nevBe(v);vsHtml='';document.activeElement?.blur();versenyKartya(true)}};
 }
 function toast(msg){const t=document.createElement('div');t.className='toast';t.textContent=msg;document.getElementById('toasts').appendChild(t);setTimeout(()=>t.remove(),2800)}
 
@@ -602,7 +673,8 @@ function frame(now){
   swarmTick(dt);
   S.last=Date.now();
   acc+=dt;saveAcc+=dt;
-  if(acc>=0.1){acc=0;renderTop();renderShop(false);renderQueen(false)}
+  if(acc>=0.1){acc=0;renderTop();renderShop(false);renderQueen(false);versenyKartya(false)}
+  vsKozolT+=dt;if(vsKozolT>=20){vsKozolT=0;VS.kozol()}
   if(saveAcc>=5){saveAcc=0;save()}
   requestAnimationFrame(frame);
 }
