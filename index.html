@@ -566,13 +566,16 @@ const VILAGOK=[
   ['lo:jart','Kísérleti Lőtér','../Kiserleti_robbantas/','Egy rakétaprogram 1957-ből. A kilövőállás melletti akácos a legjobb legelő az országban.'],
   ['r3:jart','Raktár 3D','../raktar-3d/','Egy raktár, ahol a mézes üvegek is tárhelyet kapnak.'],
   ['eg:jart','Égtorony','../Egtorony/','Egy torony, amely a felhők fölé nő. A tetején más virágok nyílnak.'],
+  ['me:jart','Mélység','../Melyseg/','Egy fúrókapszula a Föld közepe felé. A gyökerek csak a felső métereket ismerik.'],
+  ['jt:jart','Jeltörő','../Jel-toro/','Egy lehallgatóállomás. Az egyik adását a csillagméhek szárnyzúgása hordozza.'],
+  ['tt:jart','Toldaléktorony','../Toldalektorony/','Kaptár-a-i-nk-ban: négy emelet egy szóban.'],
 ];
 let univSzoveg='';
 function univKartya(){
   const el=document.getElementById('univKartya');if(!el)return;
   const n=univ.get(),jart=VILAGOK.filter(v=>n[v[0]]);
   // egyszeri ajándékok: méhpempő más világok mérföldköveiért (a Teljes újrakezdés után is csak egyszer)
-  const ajandek=[['eh:egg:mezorszag',5,'Egy fekete lyuk mögötti buborékban rátaláltak a méhesedre: +5 méhpempő.'],['lo:orbit',3,'A lőtér műholdja új, virágzó dűlőket fényképezett: +3 méhpempő.'],['eh:horizont',5,'Egy eseményhorizont mögül édes, időtlen fény szivárog: +5 méhpempő.'],['eg:sziv',5,'Az Égtorony Szívének legyőzése után égi virágpor hullik: +5 méhpempő.']];
+  const ajandek=[['eh:egg:mezorszag',5,'Egy fekete lyuk mögötti buborékban rátaláltak a méhesedre: +5 méhpempő.'],['me:kozep',5,'A Föld közepéről meleg fény szivárog fel a gyökerekig: +5 méhpempő.'],['jt:jel',3,'Egy adás a jövőből: „Ne add fel, megéri.” +3 méhpempő.'],['lo:orbit',3,'A lőtér műholdja új, virágzó dűlőket fényképezett: +3 méhpempő.'],['eh:horizont',5,'Egy eseményhorizont mögül édes, időtlen fény szivárog: +5 méhpempő.'],['eg:sziv',5,'Az Égtorony Szívének legyőzése után égi virágpor hullik: +5 méhpempő.']];
   for(const [k,db,sz] of ajandek)if(n[k]&&univ.set('mo:ajandek:'+k)){S.pempo+=db;toast(sz);save()}
   if(!jart.length&&!n['mo:csillag']){el.hidden=true;return}
   const h='<h3>Más világok</h3>'+(n['mo:csillag']?'<p>A csillagméhek egy távoli, fénylő pont felé repülnek. Mintha tudnák, hogy máshol is van élet.</p>':'')
